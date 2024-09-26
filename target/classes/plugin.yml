@@ -1,9 +1,0 @@
-name: WindStaffRemake
-version: '1.0.0'
-main: me.axiumyu.WindStaffRemake
-api-version: '1.21'
-commands:
-  windstaff:
-    description: "WindStaffRemake"
-  staffup:
-    description: "WindStaffRemake"
