@@ -3,6 +3,7 @@ package me.axiumyu
 import me.axiumyu.Staff.Companion.FOOD
 import me.axiumyu.Staff.Companion.OWNER
 import me.axiumyu.Staff.Companion.TAG
+import me.yic.xconomy.api.XConomyAPI
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -21,6 +22,11 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 abstract class WindStaffRemake : JavaPlugin(), Listener{
+
+    companion object {
+        @JvmField
+        val xc = XConomyAPI()
+    }
 
     override fun onEnable() {
         getCommand("windstaff")?.setExecutor(StaffGet())

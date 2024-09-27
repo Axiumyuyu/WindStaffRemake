@@ -3,6 +3,7 @@ package me.axiumyu
 import me.axiumyu.Staff.Companion.FOOD
 import me.axiumyu.Staff.Companion.LEVEL
 import me.axiumyu.Staff.Companion.TAG
+import me.axiumyu.WindStaffRemake.Companion.xc
 import me.yic.xconomy.api.XConomyAPI
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.TextColor
@@ -22,7 +23,7 @@ class StaffUpdate : CommandExecutor {
         p0: CommandSender, p1: Command, p2: String,
         p3: Array<out String>?
     ): Boolean {
-        val xc = XConomyAPI()
+
         if (p0 !is Player) return false
         val item = p0.inventory.itemInMainHand
         if (item.type != Material.STICK) return false
@@ -38,9 +39,10 @@ class StaffUpdate : CommandExecutor {
             )
             return false
         }
+        xc.changePlayerBalance(p0.uniqueId,p0.name, getUpCost(level).toBigDecimal(), false)
         item.editMeta {
             val food = it.persistentDataContainer.get(FOOD, PersistentDataType.INTEGER)!!
-            if (level.mod(5) == 0) {
+            if (level.mod(5) == 0 && food > 1) {
                 it.persistentDataContainer.set(FOOD, PersistentDataType.INTEGER, food - 1)
             }
             it.addEnchant(Enchantment.FEATHER_FALLING, level + 1, true)
@@ -51,6 +53,6 @@ class StaffUpdate : CommandExecutor {
     }
 
     fun getUpCost(lvl: Int): Double {
-        return log10(lvl.toDouble()) + lvl.toDouble()
+        return log10(lvl.toDouble()) + lvl.toDouble() + 5
     }
 }
