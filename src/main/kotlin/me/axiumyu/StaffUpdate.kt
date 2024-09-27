@@ -4,9 +4,7 @@ import me.axiumyu.Staff.Companion.FOOD
 import me.axiumyu.Staff.Companion.LEVEL
 import me.axiumyu.Staff.Companion.TAG
 import me.axiumyu.WindStaffRemake.Companion.xc
-import me.yic.xconomy.api.XConomyAPI
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextColor.color
 import org.bukkit.Material
 import org.bukkit.command.Command
@@ -15,8 +13,11 @@ import org.bukkit.command.CommandSender
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
+import kotlin.math.E
 import kotlin.math.log
-import kotlin.math.log10
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
 
 class StaffUpdate : CommandExecutor {
     override fun onCommand(
@@ -32,27 +33,35 @@ class StaffUpdate : CommandExecutor {
             ) != Staff.Companion.KEY) return false
         val level = item.itemMeta.getEnchantLevel(Enchantment.FEATHER_FALLING)
         if (xc.getPlayerData(p0.name).balance <= getUpCost(level).toBigDecimal()) {
-            p0.sendMessage(
+            p0.sendActionBar(
                 text("升级需要${xc.getdisplay(getUpCost(level).toBigDecimal())} ！").color(
                     color(0xffea3a)
                 )
             )
             return false
         }
-        xc.changePlayerBalance(p0.uniqueId,p0.name, getUpCost(level).toBigDecimal(), false)
-        item.editMeta {
-            val food = it.persistentDataContainer.get(FOOD, PersistentDataType.INTEGER)!!
-            if (level.mod(5) == 0 && food > 1) {
-                it.persistentDataContainer.set(FOOD, PersistentDataType.INTEGER, food - 1)
+        if (level <= 60) {
+            xc.changePlayerBalance(p0.uniqueId, p0.name, getUpCost(level).toBigDecimal(), false)
+            item.editMeta {
+                val food = it.persistentDataContainer.get(FOOD, PersistentDataType.INTEGER)!!
+                if (level.mod(3) == 0 && food > 1) {
+                    it.persistentDataContainer.set(FOOD, PersistentDataType.INTEGER, food - 1)
+                    it.addEnchant(Enchantment.PUNCH, food - 1, true)
+                }
+                it.addEnchant(Enchantment.FEATHER_FALLING, level + 1, true)
+                it.persistentDataContainer.set(LEVEL, PersistentDataType.INTEGER, level)
             }
-            it.addEnchant(Enchantment.FEATHER_FALLING, level + 1, true)
-            it.persistentDataContainer.set(LEVEL, PersistentDataType.INTEGER, level)
+        } else {
+            p0.sendActionBar(text("已经达到最高等级！").color(color(0xffea3a)))
+            return false
         }
-        p0.sendMessage(text("升级成功！").color(color(0xa3fffc)))
+        p0.sendActionBar(
+            text("升级成功！，花费了${xc.getdisplay(getUpCost(level - 1).toBigDecimal())}").color(color(0xa3fffc))
+        )
         return true
     }
 
     fun getUpCost(lvl: Int): Double {
-        return log10(lvl.toDouble()) + lvl.toDouble() + 5
+        return min(lvl.toDouble().pow(1.1), 1.3*lvl.toDouble())
     }
 }

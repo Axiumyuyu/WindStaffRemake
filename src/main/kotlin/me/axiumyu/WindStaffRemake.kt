@@ -4,7 +4,8 @@ import me.axiumyu.Staff.Companion.FOOD
 import me.axiumyu.Staff.Companion.OWNER
 import me.axiumyu.Staff.Companion.TAG
 import me.yic.xconomy.api.XConomyAPI
-import org.bukkit.GameMode
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.TextColor.color
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.event.EventHandler
@@ -21,7 +22,7 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
-abstract class WindStaffRemake : JavaPlugin(), Listener{
+class WindStaffRemake : JavaPlugin(), Listener {
 
     companion object {
         @JvmField
@@ -38,20 +39,20 @@ abstract class WindStaffRemake : JavaPlugin(), Listener{
         // Plugin shutdown logic
     }
 
-    //TODO:将消耗的饱食度，飞起的速度系数与等级挂钩
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerInteract(event: PlayerInteractEvent) {
-
         if (event.item == null) return
         if (event.item!!.type != Material.STICK) return
-        if (event.item!!.persistentDataContainer.get(
-                TAG, PersistentDataType.STRING
-            ) != Staff.Companion.KEY || (event.action != Action.RIGHT_CLICK_BLOCK && event.action != Action.RIGHT_CLICK_AIR)) return
+        if ((event.action != Action.RIGHT_CLICK_BLOCK && event.action != Action.RIGHT_CLICK_AIR) || event.item!!.persistentDataContainer.get(TAG, PersistentDataType.STRING) != Staff.Companion.KEY) return
         val food = event.item!!.persistentDataContainer.get(FOOD, PersistentDataType.INTEGER)!!
-        if (server.getPlayer(
-                event.item!!.persistentDataContainer.get(OWNER, PersistentDataType.STRING) as String
-            ) != event.player || event.player.foodLevel < food) return
-
+        if (event.player.foodLevel < food) {
+            event.player.sendActionBar(text("你没有足够的饱食度！").color(color(0xffea3a)))
+            return
+        }
+        if (server.getPlayer(event.item!!.persistentDataContainer.get(OWNER, PersistentDataType.STRING) as String) != event.player){
+            event.player.sendActionBar(text("这不是你的物品！").color(color(0xffea3a)))
+            return
+        }
 
         event.player.foodLevel -= food
         val lev = event.item!!.persistentDataContainer.get(Staff.Companion.LEVEL, PersistentDataType.INTEGER)!!
@@ -59,13 +60,12 @@ abstract class WindStaffRemake : JavaPlugin(), Listener{
         val pitch: Double = pl.pitch.toDouble()
         val yaw: Double = pl.yaw.toDouble()
         val vec: Vector = pl.velocity
-        val halfPi = PI / 2
-        val exact: Double = 2 * abs((toRadians(abs(pitch)) - halfPi) / halfPi)
-        vec.x = (lev - exact) * sin(toRadians(yaw)) * 0.1 + 0.05 * vec.getX()
-        vec.y = -lev * sin(toRadians(pitch)) * 0.1 + 0.25 * vec.getY()
-        vec.z = (exact - lev) * cos(toRadians(yaw)) * 0.1 + 0.05 * vec.getZ()
+        val exact: Double = 4 * abs((toRadians(abs(pitch)) - PI) / PI)
+        vec.x = (2 - exact) * sin(toRadians(yaw)) + vec.getX()
+        vec.y = -2 * sin(toRadians(pitch)) + vec.getY()
+        vec.z = (exact - 2) * cos(toRadians(yaw)) + vec.getZ()
         pl.playSound(pl.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0F, 1.0F)
-        pl.velocity = vec
+        pl.velocity = vec.multiply(lev.toDouble() / 30)
         pl.fallDistance = -20F
     }
 }

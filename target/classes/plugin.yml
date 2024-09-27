@@ -7,3 +7,7 @@ commands:
     description: "WindStaffRemake"
   staffup:
     description: "WindStaffRemake"
+dependencies:
+  - Xconomy
+libraries:
+  - 'org.jetbrains.kotlin:kotlin-stdlib:2.0.0'
