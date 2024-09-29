@@ -59,16 +59,16 @@ class WindStaffRemake : JavaPlugin(), Listener {
         }
 
         event.player.foodLevel -= food
-        val lev = event.item!!.getEnchantmentLevel(Enchantment.FEATHER_FALLING)
+        val lev = event.item!!.getEnchantmentLevel(Enchantment.FEATHER_FALLING).toDouble()
         val pl = event.player
         val pitch = pl.pitch.toDouble()
         val yaw = pl.yaw.toDouble()
         val vec = pl.velocity
         val exact: Double = 4 * abs((toRadians(abs(pitch)) - PI) / PI)
-        vec.x = (2 - exact) * sin(toRadians(yaw)) + 0.3 * vec.getX()
-        vec.y = -2 * sin(toRadians(pitch)) + 0.1 * vec.getY()
-        vec.z = (exact - 2) * cos(toRadians(yaw)) + 0.3 * vec.getZ()
-        pl.velocity = vec.multiply(lev.toDouble() / 35)
+        vec.x = (2 - exact) * sin(toRadians(yaw)) + 0.15 * vec.getX()
+        vec.y = -2 * sin(toRadians(pitch)) + 0.05 * vec.getY()
+        vec.z = (exact - 2) * cos(toRadians(yaw)) + 0.15 * vec.getZ()
+        pl.velocity = vec.multiply(lev / 35)
         pl.playSound(pl.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0F, 1.0F)
         pl.fallDistance = -20F
     }
