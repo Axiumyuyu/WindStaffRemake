@@ -1,6 +1,5 @@
 package me.axiumyu
 
-import me.axiumyu.Staff.Companion.FOOD
 import me.axiumyu.Staff.Companion.OWNER
 import me.axiumyu.Staff.Companion.TAG
 import me.yic.xconomy.api.XConomyAPI
@@ -16,7 +15,6 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.util.Vector
 import java.lang.Math.toRadians
 import kotlin.math.PI
 import kotlin.math.abs
@@ -44,7 +42,7 @@ class WindStaffRemake : JavaPlugin(), Listener {
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.item == null) return
         if (event.item!!.type != Material.STICK) return
-        if (event.action != Action.RIGHT_CLICK_AIR || event.item!!.persistentDataContainer.get(TAG, PersistentDataType.STRING
+        if ((event.action != Action.RIGHT_CLICK_AIR && event.action!= Action.RIGHT_CLICK_BLOCK) || event.item!!.persistentDataContainer.get(TAG, PersistentDataType.STRING
             ) != Staff.Companion.KEY) return
         val food = event.item!!.getEnchantmentLevel(Enchantment.PUNCH)
         if (event.player.foodLevel < food) {

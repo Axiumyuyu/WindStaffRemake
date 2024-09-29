@@ -61,7 +61,7 @@ class StaffUpdate : CommandExecutor {
             }
         }
         if (oldLevel != newLevel) {
-            xc.changePlayerBalance(p0.uniqueId,p0.name,allCost.toBigDecimal(),false)
+            xc.changePlayerBalance(p0.uniqueId, p0.name, allCost.toBigDecimal(), false)
             item.editMeta { it.addEnchant(Enchantment.FEATHER_FALLING, newLevel, true) }
         }
         if (oldFood != newFood) {
@@ -72,7 +72,7 @@ class StaffUpdate : CommandExecutor {
             30 -> item.editMeta { it.setRarity(ItemRarity.RARE) }
             45 -> item.editMeta { it.setRarity(ItemRarity.EPIC) }
         }
-        p0.sendActionBar(text("升级共消耗了 ${xc.getdisplay(allCost.toBigDecimal())} ！").color(color(0x00ff00)))
+        p0.sendMessage(text("升级共消耗了 ${xc.getdisplay(allCost.toBigDecimal())} ！").color(color(0x00ff00)))
         return true
     }
 
