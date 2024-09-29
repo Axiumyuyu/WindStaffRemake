@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.TextColor.color
 import org.bukkit.Material
 import org.bukkit.Sound
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -43,29 +44,32 @@ class WindStaffRemake : JavaPlugin(), Listener {
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.item == null) return
         if (event.item!!.type != Material.STICK) return
-        if ((event.action != Action.RIGHT_CLICK_BLOCK && event.action != Action.RIGHT_CLICK_AIR) || event.item!!.persistentDataContainer.get(TAG, PersistentDataType.STRING) != Staff.Companion.KEY) return
-        val food = event.item!!.persistentDataContainer.get(FOOD, PersistentDataType.INTEGER)!!
+        if (event.action != Action.RIGHT_CLICK_AIR || event.item!!.persistentDataContainer.get(TAG, PersistentDataType.STRING
+            ) != Staff.Companion.KEY) return
+        val food = event.item!!.getEnchantmentLevel(Enchantment.PUNCH)
         if (event.player.foodLevel < food) {
             event.player.sendActionBar(text("你没有足够的饱食度！").color(color(0xffea3a)))
             return
         }
-        if (server.getPlayer(event.item!!.persistentDataContainer.get(OWNER, PersistentDataType.STRING) as String) != event.player){
+        if (server.getPlayer(
+                event.item!!.persistentDataContainer.get(OWNER, PersistentDataType.STRING) as String
+            ) != event.player) {
             event.player.sendActionBar(text("这不是你的物品！").color(color(0xffea3a)))
             return
         }
 
         event.player.foodLevel -= food
-        val lev = event.item!!.persistentDataContainer.get(Staff.Companion.LEVEL, PersistentDataType.INTEGER)!!
+        val lev = event.item!!.getEnchantmentLevel(Enchantment.FEATHER_FALLING)
         val pl = event.player
-        val pitch: Double = pl.pitch.toDouble()
-        val yaw: Double = pl.yaw.toDouble()
-        val vec: Vector = pl.velocity
+        val pitch = pl.pitch.toDouble()
+        val yaw = pl.yaw.toDouble()
+        val vec = pl.velocity
         val exact: Double = 4 * abs((toRadians(abs(pitch)) - PI) / PI)
-        vec.x = (2 - exact) * sin(toRadians(yaw)) + vec.getX()
-        vec.y = -2 * sin(toRadians(pitch)) + vec.getY()
-        vec.z = (exact - 2) * cos(toRadians(yaw)) + vec.getZ()
+        vec.x = (2 - exact) * sin(toRadians(yaw)) + 0.3 * vec.getX()
+        vec.y = -2 * sin(toRadians(pitch)) + 0.1 * vec.getY()
+        vec.z = (exact - 2) * cos(toRadians(yaw)) + 0.3 * vec.getZ()
+        pl.velocity = vec.multiply(lev.toDouble() / 35)
         pl.playSound(pl.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0F, 1.0F)
-        pl.velocity = vec.multiply(lev.toDouble() / 30)
         pl.fallDistance = -20F
     }
 }

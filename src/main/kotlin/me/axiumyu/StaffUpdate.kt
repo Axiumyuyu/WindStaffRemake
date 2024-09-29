@@ -12,8 +12,10 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemRarity
 import org.bukkit.persistence.PersistentDataType
 import kotlin.math.E
+import kotlin.math.exp
 import kotlin.math.log
 import kotlin.math.max
 import kotlin.math.min
@@ -31,37 +33,37 @@ class StaffUpdate : CommandExecutor {
         if (item.persistentDataContainer.get(
                 TAG, PersistentDataType.STRING
             ) != Staff.Companion.KEY) return false
-        val level = item.itemMeta.getEnchantLevel(Enchantment.FEATHER_FALLING)
-        if (xc.getPlayerData(p0.name).balance <= getUpCost(level).toBigDecimal()) {
-            p0.sendActionBar(
-                text("升级需要${xc.getdisplay(getUpCost(level).toBigDecimal())} ！").color(
-                    color(0xffea3a)
-                )
-            )
-            return false
-        }
-        if (level <= 60) {
-            xc.changePlayerBalance(p0.uniqueId, p0.name, getUpCost(level).toBigDecimal(), false)
-            item.editMeta {
-                val food = it.persistentDataContainer.get(FOOD, PersistentDataType.INTEGER)!!
-                if (level.mod(3) == 0 && food > 1) {
-                    it.persistentDataContainer.set(FOOD, PersistentDataType.INTEGER, food - 1)
-                    it.addEnchant(Enchantment.PUNCH, food - 1, true)
-                }
-                it.addEnchant(Enchantment.FEATHER_FALLING, level + 1, true)
-                it.persistentDataContainer.set(LEVEL, PersistentDataType.INTEGER, level)
-            }
-        } else {
+        val upTo = p3?.get(0)?.toInt() ?: 1
+        if (item.itemMeta.getEnchantLevel(Enchantment.FEATHER_FALLING) == 60) {
             p0.sendActionBar(text("已经达到最高等级！").color(color(0xffea3a)))
             return false
         }
-        p0.sendActionBar(
-            text("升级成功！，花费了${xc.getdisplay(getUpCost(level - 1).toBigDecimal())}").color(color(0xa3fffc))
-        )
+        var allCost = 0.0
+        for (i in 1..upTo) {
+            val level = item.itemMeta.getEnchantLevel(Enchantment.FEATHER_FALLING)
+            val food = item.itemMeta.getEnchantLevel(Enchantment.PUNCH)
+            if (level < 60) {
+                xc.changePlayerBalance(p0.uniqueId, p0.name, getUpCost(level).toBigDecimal(), false)
+                allCost += getUpCost(level)
+                item.editMeta {
+                    if (level.mod(3) == 0 && food > 1) {
+                        it.addEnchant(Enchantment.PUNCH, food - 1, true)
+                    }
+                    it.addEnchant(Enchantment.FEATHER_FALLING, level + 1, true)
+                }
+            } else {
+                p0.sendActionBar(text("已经达到最高等级！").color(color(0xffea3a)))
+            }
+        }
+        when (item.itemMeta.getEnchantLevel(Enchantment.FEATHER_FALLING)) {
+            15 -> item.editMeta { it.setRarity(ItemRarity.UNCOMMON) }
+            30 -> item.editMeta { it.setRarity(ItemRarity.RARE) }
+            45 -> item.editMeta { it.setRarity(ItemRarity.EPIC) }
+        }
         return true
     }
 
     fun getUpCost(lvl: Int): Double {
-        return min(lvl.toDouble().pow(1.1), 1.3*lvl.toDouble())
+        return min(lvl.toDouble().pow(1.06), 1.25 * lvl.toDouble())
     }
 }
