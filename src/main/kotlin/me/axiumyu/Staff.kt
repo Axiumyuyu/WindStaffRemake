@@ -13,8 +13,8 @@ import org.bukkit.persistence.PersistentDataType
 
 class Staff(pl: Player) {
     val staff: ItemStack = ItemStack(Material.STICK)
-    var level: Int = 1
-    var food: Int = 11
+    val level: Int = 1
+    val food: Int = 11
     val owner: Player = pl
 
     companion object {
@@ -22,13 +22,7 @@ class Staff(pl: Player) {
         val TAG = NamespacedKey("axiumyu", "tag")
 
         @JvmField
-        val LEVEL = NamespacedKey("axiumyu", "level")
-
-        @JvmField
         val OWNER = NamespacedKey("axiumyu", "owner")
-
-        @JvmField
-        val FOOD = NamespacedKey("axiumyu", "food")
 
         const val KEY = "wind-staff"
     }
@@ -37,7 +31,7 @@ class Staff(pl: Player) {
         staff.editMeta {
             it.displayName(text().content("风之法杖").color(color(0xa3fffc)).build())
             it.lore(
-                mutableListOf<Component>(
+                listOf<Component>(
                     text().content("物品绑定于： ${owner.name} ").color(color(0xa3fffc))
                         .build(),
                     text().content("右键点击吹向空中").color(color(0xa3fffc)).build(),
