@@ -38,7 +38,7 @@ class WindStaffRemake : JavaPlugin(), Listener {
         // Plugin shutdown logic
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.item == null) return
         if (event.item!!.type != Material.STICK) return
