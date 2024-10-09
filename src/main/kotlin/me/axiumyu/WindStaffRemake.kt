@@ -11,7 +11,6 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
@@ -24,8 +23,7 @@ import kotlin.math.sin
 class WindStaffRemake : JavaPlugin(), Listener {
 
     companion object {
-        @JvmField
-        val xc = XConomyAPI()
+        val xc by lazy { XConomyAPI() }
     }
 
     override fun onEnable() {
@@ -38,12 +36,12 @@ class WindStaffRemake : JavaPlugin(), Listener {
         // Plugin shutdown logic
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.item == null) return
         if (event.item!!.type != Material.STICK) return
-        if ((event.action != Action.RIGHT_CLICK_AIR && event.action!= Action.RIGHT_CLICK_BLOCK) || event.item!!.persistentDataContainer.get(TAG, PersistentDataType.STRING
-            ) != Staff.Companion.KEY) return
+        if (event.item!!.persistentDataContainer.get(TAG, PersistentDataType.STRING) != Staff.Companion.KEY) return
+        if (!event.action.isRightClick) return
         val food = event.item!!.getEnchantmentLevel(Enchantment.PUNCH)
         if (event.player.foodLevel < food) {
             event.player.sendActionBar(text("你没有足够的饱食度！").color(color(0xffea3a)))
