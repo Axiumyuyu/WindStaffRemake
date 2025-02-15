@@ -15,19 +15,15 @@ import org.bukkit.persistence.PersistentDataType
 import kotlin.math.round
 import kotlin.random.Random
 
-class StaffUpdate : CommandExecutor {
-    override fun onCommand(
-        p0: CommandSender, p1: Command, p2: String,
-        p3: Array<out String>?
-    ): Boolean {
+object StaffUpdate : CommandExecutor {
+    override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): Boolean {
 
         if (p0 !is Player) return false
         val item = p0.inventory.itemInMainHand
-        if (item.type != Material.STICK) return false
         if (item.persistentDataContainer.get(
                 TAG, PersistentDataType.STRING
-            ) != Staff.Companion.KEY) return false
-        val upTo = p3?.get(0)?.toInt() ?: 1
+            ) != Staff.KEY) return false
+        val upTo = p3[0].toIntOrNull() ?: 1
         if (upTo > 61) {
             p0.sendActionBar(text("最高等级为 61 级！").color(color(0xffea3a)))
             return false
@@ -76,7 +72,7 @@ class StaffUpdate : CommandExecutor {
         return true
     }
 
-    fun getUpCost(lvl: Int): Double {
+    private fun getUpCost(lvl: Int): Double {
         return lvl.toDouble() + round(Random.nextDouble() * 2000.0) / 100 - 5.0
     }
 }

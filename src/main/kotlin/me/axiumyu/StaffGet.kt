@@ -9,11 +9,8 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.math.BigDecimal
 
-class StaffGet : CommandExecutor {
-    override fun onCommand(
-        p0: CommandSender, p1: Command, p2: String,
-        p3: Array<out String>?
-    ): Boolean {
+object StaffGet : CommandExecutor {
+    override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): Boolean {
         if (p0 !is Player) return false
         if (p0.inventory.firstEmpty() == -1) {
             p0.sendMessage(text("背包没有空位").color(color(0xffea3a)))

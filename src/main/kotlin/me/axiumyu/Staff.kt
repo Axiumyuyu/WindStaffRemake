@@ -6,16 +6,19 @@ import net.kyori.adventure.text.format.TextColor.color
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.enchantments.Enchantment.FEATHER_FALLING
+import org.bukkit.enchantments.Enchantment.PUNCH
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemRarity
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
-class Staff(pl: Player) {
-    val staff: ItemStack = ItemStack(Material.STICK)
-    val level: Int = 1
-    val food: Int = 11
-    val owner: Player = pl
+class Staff(pl: Player, itemStack: ItemStack = ItemStack(Material.STICK),enchs : Map<Enchantment, Int> = mapOf()) {
+    var staff: ItemStack = itemStack
+    private val level: Int = enchs[FEATHER_FALLING] ?: 1
+    private val food: Int = enchs[PUNCH] ?: 11
+    private val owner: Player = pl
+
 
     companion object {
         @JvmField
@@ -25,9 +28,11 @@ class Staff(pl: Player) {
         val OWNER = NamespacedKey("axiumyu", "owner")
 
         const val KEY = "wind-staff"
+
     }
 
     init {
+        staff.amount = 1
         staff.editMeta {
             it.displayName(text().content("风之法杖").color(color(0xa3fffc)).build())
             it.lore(
@@ -47,8 +52,9 @@ class Staff(pl: Player) {
             )
             it.persistentDataContainer.set(TAG, PersistentDataType.STRING, KEY)
             it.persistentDataContainer.set(OWNER, PersistentDataType.STRING, owner.name)
-            it.addEnchant(Enchantment.FEATHER_FALLING, level, true)
-            it.addEnchant(Enchantment.PUNCH, food, true)
+            it.enchants.keys.all { ench -> it.removeEnchant(ench) }
+            it.addEnchant(FEATHER_FALLING, level, true)
+            it.addEnchant(PUNCH, food, true)
             it.setMaxStackSize(1)
             it.setRarity(ItemRarity.COMMON)
         }
