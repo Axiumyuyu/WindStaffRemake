@@ -55,7 +55,7 @@ object Rebind : CommandExecutor{
                 p0.sendMessage(text().content("副手物品不属于你").color(color(0xa3fffc)))
                 return false
             }
-            val enchs = oldItem.enchantments.filter { it.key== Enchantment.PUNCH || it.key == Enchantment.FEATHER_FALLING }
+            val enchs = oldItem.enchantments.filter { it.key== PUNCH || it.key == FEATHER_FALLING }
             if (enchs.size!= 2) {
                 p0.sendMessage(text().content("副手物品附魔不正确").color(color(0xa3fffc)))
                 return false
